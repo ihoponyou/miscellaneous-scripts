@@ -47,18 +47,18 @@ if __name__ == '__main__':
     path_to_traverse = get_file_path()
     processed_filenames = {}
     for dirpath, dirnames, filenames in os.walk(path_to_traverse):
-        for filepath in filenames:
-            if not filepath.endswith(VALID_FILE_EXTENSIONS):
+        for filename in filenames:
+            if not filename.endswith(VALID_FILE_EXTENSIONS):
                 continue
 
-            working_name = filepath
+            working_name = filename
             
-            date_match = re.search(BAD_DATE_PATTERN, filepath)
-            if date_match:
-                working_name = fix_bad_date_format(dirpath, filepath, date_match)
+            bad_date_match = re.search(BAD_DATE_PATTERN, filename)
+            if bad_date_match:
+                working_name = fix_bad_date_format(dirpath, filename, bad_date_match)
 
-            if not (date_match or re.search(GOOD_DATE_PATTERN, filepath)):
-                working_name = add_date_to_filename(dirpath, filepath)
+            if not (bad_date_match or re.search(GOOD_DATE_PATTERN, filename)):
+                working_name = add_date_to_filename(dirpath, filename)
             
             abs_path_no_extension = os.path.join(dirpath, working_name[:-4])
             try:
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     if DELETE_DUPLICATE_CLIPS:    
         # some clips were auto-remuxed from .mkv to .mp4
         # and i didnt clean them out
-        for filepath, copies in processed_filenames.items():
+        for filename, copies in processed_filenames.items():
             if copies < 2:
                 continue
-            mp4_path = f'{filepath}.mp4'
+            mp4_path = f'{filename}.mp4'
             os.remove(mp4_path) # this is scary
